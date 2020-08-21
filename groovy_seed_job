@@ -1,0 +1,116 @@
+job("task6job1") {
+  description("This job will pull the github repository when developer commit code, create or update the container using given Dockerfile and push image to DockerHub")
+  
+  scm {
+    github('kethavathsivanaik/task4','master')
+  }
+  
+  triggers {
+    githubPush()
+  }
+  
+  wrappers {
+    preBuildCleanup()
+  }
+  
+  steps {
+    dockerBuildAndPublish {
+      repositoryName('202011501/webapplication')
+      tag("v1")
+      dockerHostURI('tcp://3.93.164.102:4243')
+      registryCredentials('Docker')
+      createFingerprints(false)
+      skipDecorate(false)
+      skipTagAsLatest(true)
+    }
+  }
+  
+}
+
+job("task6job2") {
+  description("This job will run on Jenkins Dynamic Docker Cloud")
+  triggers {
+    upstream('task6job1', 'SUCCESS')
+  }
+  
+  command = """
+export len1=\$(ls -l /var/lib/jenkins/workspace/task6job1 | grep html | wc -l)
+if [ \$len1 -gt 0 ]
+then
+	export len2=\$(sudo kubectl get deployments | grep webserver | wc -l)
+	if [ \$len2 -gt 0 ]
+	then
+		sudo kubectl rollout restart deployment/webserver
+		sudo kubectl rollout status deployment/webserver
+  else
+		sudo kubectl create deployment webserver --image=202011501/webapplication:v1
+		sudo kubectl scale deployment webserver --replicas=3
+		sudo kubectl expose deployment webserver --port 80 --type NodePort
+	fi
+fi
+"""
+  
+  steps {
+    shell(command)
+  }
+  
+}
+
+job("task6job3") {
+  description ("This Job  will test WebSite and send a mail")
+  
+  triggers {
+    upstream('task6job2', 'SUCCESS')
+  }
+  steps {
+    shell('''ip=$(curl ifconfig.me)
+if kubectl get deployment | grep webserver
+then
+    echo "Testing deployment ..."
+    port=$(kubectl get svc html-deploy -o=yaml -o jsonpath='{.spec.ports[*].nodePort}')
+    status_html=$(curl  -o /dev/null  -s  -w  "%{http_code}"  http://$ip:$port/index.html)
+    if [ $status_html==200 ]; then
+    	echo "website is working"
+    else
+    	echo "website not working"
+    	exit 1
+	fi
+fi''')
+  }
+  publishers {
+    extendedEmail {
+      contentType('text/html')
+      triggers {
+        success{
+          attachBuildLog(true)
+          subject('Build successfull')
+          content('Deployment Done.Everything is working great !!')
+          recipientList('sivanaikk143@gmail.com')
+        }
+        failure{
+          attachBuildLog(true)
+          subject('Failed build')
+          content('The build was failed. You can check Once !!')
+          recipientList('sivanaikk143@gmail.com')
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+buildPipelineView('task6') {
+  filterBuildQueue(true)
+  filterExecutors(false)
+  title('task6')
+  displayedBuilds(1)
+  selectedJob('task6job1')
+  alwaysAllowManualTrigger(false)
+  showPipelineParameters(true)
+  refreshFrequency(1)
+}
