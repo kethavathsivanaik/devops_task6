@@ -70,9 +70,9 @@ then
     port=$(kubectl get svc html-deploy -o=yaml -o jsonpath='{.spec.ports[*].nodePort}')
     status_html=$(curl  -o /dev/null  -s  -w  "%{http_code}"  http://$ip:$port/index.html)
     if [ $status_html==200 ]; then
-    	echo "website is working"
+    	echo "website is working !"
     else
-    	echo "website not working"
+    	echo "website not working !"
     	exit 1
 	fi
 fi''')
