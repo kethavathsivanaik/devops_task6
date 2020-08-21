@@ -6,7 +6,7 @@ job("task6job1") {
   }
   
   triggers {
-    githubPush()
+    scm("* * * * *")
   }
   
   wrappers {
@@ -17,7 +17,7 @@ job("task6job1") {
     dockerBuildAndPublish {
       repositoryName('202011501/webapplication')
       tag("latest")
-      dockerHostURI('tcp://0.0.0.0:4243')
+      dockerHostURI('tcp://3.93.164.102:4243')
       registryCredentials('Docker')
       createFingerprints(false)
       skipDecorate(false)
