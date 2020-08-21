@@ -16,8 +16,8 @@ job("task6job1") {
   steps {
     dockerBuildAndPublish {
       repositoryName('202011501/webapplication')
-      tag("v1")
-      dockerHostURI('tcp://3.93.164.102:4243')
+      tag("latest")
+      dockerHostURI('tcp://0.0.0.0:4243')
       registryCredentials('Docker')
       createFingerprints(false)
       skipDecorate(false)
@@ -43,7 +43,7 @@ then
 		sudo kubectl rollout restart deployment/webserver
 		sudo kubectl rollout status deployment/webserver
   else
-		sudo kubectl create deployment webserver --image=202011501/webapplication:v1
+		sudo kubectl create deployment webserver --image=202011501/webapplication:latest
 		sudo kubectl scale deployment webserver --replicas=3
 		sudo kubectl expose deployment webserver --port 80 --type NodePort
 	fi
