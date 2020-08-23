@@ -3,7 +3,7 @@ job("task6job1") {
   
   scm {
     github('kethavathsivanaik/task4','master')
-    credentialsId('3ecc58c1-6536-491a-b594-3f87acc10b90') 
+    credentials('Ceredential to github')
   }
   
   triggers {
