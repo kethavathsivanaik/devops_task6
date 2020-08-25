@@ -29,7 +29,7 @@ job("task6job1") {
 
 job("task6job2") {
   description("This job will run on Jenkins Dynamic Docker Cloud")
-  tiriggers {
+  triggers {
     upstream('task6job1', 'SUCCESS')
   }
   
