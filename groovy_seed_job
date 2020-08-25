@@ -8,11 +8,7 @@ job("task6job1") {
   triggers {
     scm("* * * * *")
   }
-  
-  wrappers {
-    preBuildCleanup()
-  }
-  
+    
   steps {
     dockerBuildAndPublish {
       repositoryName('202011501/webapplication')
@@ -34,7 +30,7 @@ job("task6job2") {
   }
   
   command = """
-export len1=\$(ls -l /var/lib/jenkins/workspace/task6job1 | grep html | wc -l)
+export len1=\$(ls -l /root/.jenkins/workspace/task6job1 | grep html | wc -l)
 if [ \$len1 -gt 0 ]
 then
 	export len2=\$(sudo kubectl get deployments | grep webserver | wc -l)
