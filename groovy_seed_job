@@ -17,7 +17,7 @@ job("task6job1") {
     dockerBuildAndPublish {
       repositoryName('202011501/webapplication')
       tag("latest")
-      dockerHostURI('tcp://3.93.164.102:4243')
+      dockerHostURI('tcp://54.227.178.34:4243')
       registryCredentials('Docker')
       createFingerprints(false)
       skipDecorate(false)
